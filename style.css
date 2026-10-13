@@ -1,6 +1,6 @@
 @page {
-  size: A4 portrait;
-  margin: 12mm 15mm;
+  size: Legal portrait;
+  margin: 15mm 15mm;
 }
 
 * {
@@ -174,12 +174,57 @@ td {
   padding-top: 8px;
 }
 
-.signature-table {
+/*.signature-table {
   width: 100%;
   margin-top: 20px;
+} */
+
+/* tabel Summary */
+.summary-container {
+  background-color: #96c0ff;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border: 1px solid #cbd5e1;
 }
 
-.signature-table td {
+.summary-container h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 11pt;
+  color: #0f172a;
+  text-align: center;
+}
+
+#summaryTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10pt;
+}
+
+#summaryTable th, 
+#summaryTable td {
+  padding: 8px;
+  text-align: center;
+  border: 1px solid #cbd5e1;
+}
+
+#summaryTable th {
+  background-color: #f1f5f9;
+  color: #1e293b;
+  font-weight: bold;
+}
+
+/* Pastikan tabel ringkasan juga rapi saat di-print */
+@media print {
+  .summary-container {
+    border: none;
+    padding: 0;
+    margin-top: 15px;
+  }
+}
+/* .signature-table td {
   border: none;
   width: 50%;
   text-align: center;
@@ -189,15 +234,35 @@ td {
 
 .sig-space {
   height: 40px;
-}
+} */
 
-/* Sembunyikan Panel Kontrol saat dicetak ke PDF/Kertas */
+/* Sembunyikan Panel Kontrol saat dicetak ke PDF */
 @media print {
-  .control-panel {
-    display: none;
+  /* Paksa browser mencetak background & warna asli (standar modern) */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
+
+  /* Sembunyikan panel kontrol filter dan player musik */
+  .control-panel,
+  .audio-container {
+    display: none !important;
+  }
+
   body {
     margin: 0;
+    padding: 0;
     background-color: #ffffff;
+  }
+
+/* Sembunyikan div notes saat dicetak PDF */
+  .no-print {
+    display: none !important;
+  }
+
+  /* Garis tabel tetap jelas */
+  table, th, td {
+    border: 1px solid #475569 !important;
   }
 }
