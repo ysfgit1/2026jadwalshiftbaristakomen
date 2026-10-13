@@ -29,7 +29,7 @@
       <button class="btn-filter active" onclick="filterJadwal('all')">Semua Shift</button>
       <button class="btn-filter" onclick="filterJadwal('Yusuf')">Yusuf</button>
       <button class="btn-filter" onclick="filterJadwal('Ahmad')">Ahmad</button>
-      <button class="btn-filter" onclick="filterJadwal('Diky')">Diky</button>
+      <button class="btn-filter" onclick="filterJadwal('Diki')">Diki</button>
       <button class="btn-filter btn-special" onclick="filterKombinasiKhusus()">🟢 Yusuf Pagi & Ahmad Siang</button>
     </div>
   </div>
@@ -37,7 +37,7 @@
   <div class="info-bar">
     <div class="info-item bg-pagi">Shift Pagi: 06.00 – 14.00</div>
     <div class="info-item bg-siang">Shift Siang: 14.00 – 22.00</div>
-    <div class="info-item bg-team">Tim: Diky, Yusuf, Ahmad</div>
+    <div class="info-item bg-team">Tim: Diki, Yusuf, Ahmad</div>
   </div>
 
   <table id="tableJadwal">
@@ -45,9 +45,9 @@
       <tr>
         <th class="th-tgl">Tgl</th>
         <th class="th-hari">Hari</th>
-        <th class="th-pagi">Pagi</th>
-        <th class="th-siang">Siang</th>
-        <th class="th-off">Libur</th>
+        <th class="th-pagi">Pagi (06.00 – 14.00)</th>
+        <th class="th-siang">Siang (14.00 – 22.00)</th>
+        <th class="th-off">Libur (Off)</th>
       </tr>
     </thead>
     <tbody id="tbodyJadwal">
@@ -56,11 +56,11 @@
   </table>
 
   <div class="notes">
-    <strong>Keterangan Hijau Muda:</strong> Shift khusus tukar shift Ahmad Pagi 06.00-14.00, Yusuf Siang 14.00-22.00 reminder via Google Calendar, Diky Libur/off.<br>
-    <em>* Penukaran jadwal shift harap mengonfirmasi ke Head Bar / Manager minimal H-1.</em>
+    <strong>Keterangan Hijau Muda:</strong> Khusus tukar shift Ahmad Pagi 06.00-14.00, Yusuf Siang 14.00-22.00 reminder manual via G. Calendar, Diki Libur/off.<br>
+    <em>* format hanya untuk kalangan barista komen, harap tidak menyebar link ini, terimakasih.</em>
   </div>
-
-  <table class="signature-table">
+  
+<!--  <table class="signature-table">
     <tr>
       <td>
         Dibuat oleh,<br>
@@ -74,6 +74,31 @@
       </td>
     </tr>
   </table>
+  </div> -->
+
+  <!-- Tabel Ringkasan Total Shift & Off -->
+  <div class="summary-container">
+    <h3>Ringkasan Total Shift Crew</h3>
+    <table id="summaryTable">
+      <thead>
+        <tr>
+          <th>Nama Barista</th>
+          <th>Shift Pagi</th>
+          <th>Shift Siang</th>
+          <th>Total Libur (OFF)</th>
+          <th>Total Hari Kerja</th>
+        </tr>
+      </thead>
+      <tbody id="summaryBody">
+        <!-- Hasil hitung otomatis oleh JS akan masuk ke sini -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Cpyright dan print-->
+  <div class="notes" style="text-align: center;">
+    <strong>2026 Jadwal Barista Komen V.1</strong>
+    <button type="button" class="btn-filter no-print" onclick="window.print()">🖨️ Cetak PDF</button>
   </div>
 
   <script src="script.js"></script>
