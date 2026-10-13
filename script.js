@@ -1,14 +1,18 @@
+/* 
+  Logika rotasi shift, filter interaktif, & kalkulasi otomatis ringkasan shift.
+*/
+
 // Konfigurasi Pola Rotasi P-S-OFF (3 Hari)
 const NAMA_HARI = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
 
 // Pola Rotasi 3 Hari:
-// Pola 0: Yusuf Pagi, Ahmad Siang, Diky OFF
-// Pola 1: Diky Pagi, Yusuf Siang, Ahmad OFF
-// Pola 2: Ahmad Pagi, Diky Siang, Yusuf OFF
+// Pola 0: Yusuf Pagi, Ahmad Siang, Diki OFF
+// Pola 1: Diki Pagi, Yusuf Siang, Ahmad OFF
+// Pola 2: Ahmad Pagi, Diki Siang, Yusuf OFF
 const ROTASI = [
-  { pagi: "Yusuf", siang: "Ahmad", off: "Diky" },  // Target Kombinasi
-  { pagi: "Diky",  siang: "Yusuf", off: "Ahmad" },
-  { pagi: "Ahmad", siang: "Diky",  off: "Yusuf" }
+  { pagi: "Yusuf", siang: "Ahmad", off: "Diki" },  // Target Kombinasi
+  { pagi: "Diki",  siang: "Yusuf", off: "Ahmad" },
+  { pagi: "Ahmad", siang: "Diki",  off: "Yusuf" }
 ];
 
 // Generasi Data Otomatis untuk Bulan Terkait
@@ -37,7 +41,6 @@ function buatDataBulan(tahun, bulanIndex, polaAwalIndex) {
 }
 
 // Data Jadwal per Bulan (Kontinuitas Rotasi Terjaga)
-// Oktober 2026 Tgl 1 dimulai dari Pola 1 (Diky P, Yusuf S, Ahmad OFF)
 const dataJadwal = {
   oktober2026: {
     label: "PERIODE: OKTOBER 2026",
@@ -45,12 +48,10 @@ const dataJadwal = {
   },
   november2026: {
     label: "PERIODE: NOVEMBER 2026",
-    // 31 Okt = Pola 1, maka 1 Nov = Pola 2 (Ahmad P, Diky S, Yusuf OFF)
     list: buatDataBulan(2026, 10, 2) // 10 = November
   },
   desember2026: {
     label: "PERIODE: DESEMBER 2026",
-    // 30 Nov = Pola 2, maka 1 Des = Pola 0 (Yusuf P, Ahmad S, Diky OFF)
     list: buatDataBulan(2026, 11, 0) // 11 = Desember
   }
 };
@@ -60,10 +61,13 @@ let filterAktif = 'all';
 // Fungsi Render Tabel ke HTML
 function renderTabel(keyBulan) {
   const tbody = document.getElementById("tbodyJadwal");
+  if (!tbody) return;
+
   const dataBulan = dataJadwal[keyBulan].list;
   
   // Update Judul Header
-  document.getElementById("judulPeriode").innerText = dataJadwal[keyBulan].label;
+  const elJudul = document.getElementById("judulPeriode");
+  if (elJudul) elJudul.innerText = dataJadwal[keyBulan].label;
 
   let htmlRows = "";
 
@@ -83,8 +87,9 @@ function renderTabel(keyBulan) {
 
   tbody.innerHTML = htmlRows;
   
-  // Terapkan ulang filter nama yang sedang aktif
+  // Terapkan ulang filter nama & hitung ulang ringkasan untuk bulan yang dipilih
   terapkanFilter();
+  hitungRingkasanShift();
 }
 
 // Event handler saat dropdown bulan diubah
@@ -113,6 +118,8 @@ function terapkanFilter() {
 
   rows.forEach(row => {
     const cells = row.querySelectorAll("td");
+    if (cells.length < 5) return;
+
     const pagi = cells[2].innerText;
     const siang = cells[3].innerText;
     const off = cells[4].innerText;
@@ -155,11 +162,82 @@ function highlightCellText(cell, nama) {
 
 function resetTextHighlight(cells) {
   for (let i = 2; i <= 4; i++) {
-    cells[i].innerHTML = cells[i].innerText;
+    if (cells[i]) cells[i].innerHTML = cells[i].innerText;
   }
 }
 
-// Inisialisasi awal saat halaman pertama kali dibuka
+// Fungsi Hitung Ringkasan Shift Otomatis
+function hitungRingkasanShift() {
+  const rows = document.querySelectorAll("#tbodyJadwal tr");
+  const summaryBody = document.getElementById("summaryBody");
+  if (!summaryBody) return;
+
+  const summaryData = {};
+
+  rows.forEach(row => {
+    const cells = row.cells;
+    if (cells.length < 5) return;
+
+    const cellPagi = cells[2].textContent.trim();
+    const cellSiang = cells[3].textContent.trim();
+    const cellOff = cells[4].textContent.trim();
+
+    const tambahPoin = (namaStr, tipe) => {
+      if (!namaStr) return;
+      const names = namaStr.split(/[\n,]+/).map(n => n.trim());
+
+      names.forEach(nama => {
+        if (!nama) return;
+        if (!summaryData[nama]) {
+          summaryData[nama] = { pagi: 0, siang: 0, off: 0, totalKerja: 0 };
+        }
+
+        if (tipe === 'pagi') {
+          summaryData[nama].pagi++;
+          summaryData[nama].totalKerja++;
+        } else if (tipe === 'siang') {
+          summaryData[nama].siang++;
+          summaryData[nama].totalKerja++;
+        } else if (tipe === 'off') {
+          summaryData[nama].off++;
+        }
+      });
+    };
+
+    tambahPoin(cellPagi, 'pagi');
+    tambahPoin(cellSiang, 'siang');
+    tambahPoin(cellOff, 'off');
+  });
+
+  // Render hasil ke tabel ringkasan
+  summaryBody.innerHTML = "";
+  Object.keys(summaryData).sort().forEach(nama => {
+    const data = summaryData[nama];
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td style="text-align: left; font-weight: bold; padding-left: 8px;">${nama}</td>
+      <td style="text-align: center;">${data.pagi}</td>
+      <td style="text-align: center;">${data.siang}</td>
+      <td style="text-align: center;">${data.off}</td>
+      <td style="text-align: center;"><strong>${data.totalKerja} Hari</strong></td>
+    `;
+    summaryBody.appendChild(tr);
+  });
+}
+
+// Inisialisasi awal saat halaman dibuka
 document.addEventListener("DOMContentLoaded", () => {
   renderTabel("oktober2026");
+
+  // Kontrol Audio Player (Matikan audio lain saat diputar)
+  const allAudios = document.querySelectorAll("audio");
+  allAudios.forEach(audio => {
+    audio.addEventListener("play", function() {
+      allAudios.forEach(otherAudio => {
+        if (otherAudio !== audio) {
+          otherAudio.pause();
+        }
+      });
+    });
+  });
 });
