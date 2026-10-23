@@ -102,13 +102,13 @@ body {
   color: #ffffff;
 }
 
-.info-bar {
+/*.info-bar {
   display: flex;
   width: 100%;
   margin-bottom: 12px;
   border-radius: 6px;
   overflow: hidden;
-}
+}*/
 
 .info-item {
   flex: 1;
